@@ -1,0 +1,23 @@
+{
+  "name": "alpsdrive",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mathieu-Berthet/AlpsDrive.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mathieu-Berthet/AlpsDrive/issues"
+  },
+  "homepage": "https://github.com/Mathieu-Berthet/AlpsDrive#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
