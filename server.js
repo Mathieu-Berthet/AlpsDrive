@@ -39,8 +39,11 @@ app.get('/api/drive' , (req, res, next) => {
     let folders = {};
     let folderString;
 
-    fs.readdir(os.tmpdir(),(error, files) => {
-        console.log("lecture");
+    fs.readdir(os.tmpdir(), { withFileTypes: true },(error, files) => {
+        if(error)
+        {
+            console.log(error);
+        }
         res.status(200).json(files);
     });
     //res.status(200).json(folders);
