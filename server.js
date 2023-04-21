@@ -14,6 +14,7 @@ app.use(express.static('frontend'));
 
 let myRegex = /^[a-zA-Z]+$/;
 
+////////////////////////////////// METHOD POST ///////////////////////////////////////////////////
 //POST : Creation d'un répertoire
 app.post('/api/drive', (req, res, next) => {
     if(myRegex.test(req.query.name))
@@ -35,7 +36,7 @@ app.post('/api/drive', (req, res, next) => {
     }
 });
 
-//Post : Creation dossier dans un dossier
+//POST : Creation dossier dans un dossier
 app.post('/api/drive/:folder', (req, res, next) => {
     let folderName = req.params.folder;
     if(fs.existsSync(os.tmpdir() + "/" + folderName))
@@ -67,7 +68,7 @@ app.post('/api/drive/:folder', (req, res, next) => {
 })
 
 
-
+//////////////////////////////////  METHOD GET ///////////////////////////////////////////////////
 
 //GET tous les fichiers et dossiers d'un répertoire
 app.get('/api/drive' , async (req, res, next) => {
@@ -143,8 +144,10 @@ app.get('/api/drive/:name', (req, res, next) => {
 
 
 
-//////////// DELETE
-//POST : Creation d'un répertoire
+//////////////////////////////////  METHOD DELETE ///////////////////////////////////////////////////
+
+
+//DELETE : Supression d'un répertoire
 app.delete('/api/drive/:name', (req, res, next) => {
     if(myRegex.test(req.params.name))
     {
@@ -165,7 +168,7 @@ app.delete('/api/drive/:name', (req, res, next) => {
     }
 });
 
-//Post : Creation dossier dans un dossier
+//DELETE : Supression d'un dossier dans un dossier
 app.delete('/api/drive/:folder/:name', (req, res, next) => {
     let folderName = req.params.folder;
     let name = req.params.name;
