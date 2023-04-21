@@ -145,7 +145,7 @@ app.get('/api/drive/:name', (req, res, next) => {
 
 
 //////////////////////////////////  METHOD DELETE ///////////////////////////////////////////////////
-
+// A faire : Tester si c'est un fichier ou un dossier
 
 //DELETE : Supression d'un répertoire
 app.delete('/api/drive/:name', (req, res, next) => {
@@ -153,7 +153,7 @@ app.delete('/api/drive/:name', (req, res, next) => {
     {
         console.log("test réussi");
         //Rajouter un test pour l'existance du dossier
-        fs.rmdir(os.tmpdir() + "/" + req.params.name, (err) => {
+        fs.rm(os.tmpdir() + "/" + req.params.name, (err) => {
             if(err)
             {
                 console.log(err);
@@ -178,7 +178,7 @@ app.delete('/api/drive/:folder/:name', (req, res, next) => {
         {
             console.log("test réussi");
             //Rajouter un test pour l'existance du dossier
-            fs.rmdir(os.tmpdir() + "/" + folderName + "/" + name, (err) => {
+            fs.rm(os.tmpdir() + "/" + folderName + "/" + name, (err) => {
                 if(err)
                 {
                     console.log(err);
