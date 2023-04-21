@@ -14,6 +14,7 @@ app.use(express.static('frontend'));
 
 let myRegex = /^[a-zA-Z]+$/;
 
+//POST : Creation d'un répertoire
 app.post('/api/drive', (req, res, next) => {
     if(myRegex.test(req.query.name))
     {
@@ -35,7 +36,41 @@ app.post('/api/drive', (req, res, next) => {
     //next();
 });
 
-//async
+//Post : Creation dossier dans un dossier
+app.post('/api/drive/:folder', (req, res, next) => {
+    let folderName = req.params.folder;
+    console.log("test : ", folderName);
+    if(fs.existsSync(os.tmpdir() + "/" + folderName))
+    {
+        if(myRegex.test(req.query.name))
+        {
+            console.log("test réussi");
+            //Rajouter un test pour l'existance du dossier
+            fs.mkdir(os.tmpdir() + "/" + folderName + "/" + req.query.name, (err) => {
+                if(err)
+                {
+                    console.log(err);
+                }
+            });
+            res.status(201);
+        }
+        else
+        {
+            console.log("Test echoué");
+            res.status(400);
+        }
+    }
+    else
+    {
+        res.status(404).message('Le fichier ou répertoire n\'existe pas');
+    }
+
+})
+
+
+
+
+//GET tous les fichiers et dossiers d'un répertoire
 app.get('/api/drive' , async (req, res, next) => {
 
     let files = await fs.promises.readdir(os.tmpdir(), {withFileTypes : true});
@@ -61,6 +96,8 @@ app.get('/api/drive' , async (req, res, next) => {
 
 });
 
+
+//GET pour un seul item. Si c'est un répertoire, cela affiche les dossiers et fichiers dedans, si c'est un fichier, affiche les infos du fichier
 app.get('/api/drive/:name', (req, res, next) => {
     let nameFile = req.params.name;
     if(fs.existsSync(os.tmpdir() + "/" + nameFile))
@@ -103,6 +140,11 @@ app.get('/api/drive/:name', (req, res, next) => {
     }
 
 });
+
+
+
+//////////// DELETE
+
 
 
 module.exports = app;
