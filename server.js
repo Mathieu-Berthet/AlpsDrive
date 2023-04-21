@@ -33,13 +33,11 @@ app.post('/api/drive', (req, res, next) => {
         console.log("Test echoué");
         res.status(400);
     }
-    //next();
 });
 
 //Post : Creation dossier dans un dossier
 app.post('/api/drive/:folder', (req, res, next) => {
     let folderName = req.params.folder;
-    console.log("test : ", folderName);
     if(fs.existsSync(os.tmpdir() + "/" + folderName))
     {
         if(myRegex.test(req.query.name))
@@ -62,7 +60,8 @@ app.post('/api/drive/:folder', (req, res, next) => {
     }
     else
     {
-        res.status(404).message('Le fichier ou répertoire n\'existe pas');
+        console.log("Le fichier ou répertoire n'existe pas")
+        res.status(404);
     }
 
 })
@@ -136,7 +135,8 @@ app.get('/api/drive/:name', (req, res, next) => {
     }
     else
     {
-        res.status(404).message('Le fichier ou répertoire n\'existe pas');
+        console.log("Le dossier ou répertoire n'existe pas");
+        res.status(404);
     }
 
 });
@@ -144,7 +144,58 @@ app.get('/api/drive/:name', (req, res, next) => {
 
 
 //////////// DELETE
+//POST : Creation d'un répertoire
+app.delete('/api/drive/:name', (req, res, next) => {
+    if(myRegex.test(req.params.name))
+    {
+        console.log("test réussi");
+        //Rajouter un test pour l'existance du dossier
+        fs.rmdir(os.tmpdir() + "/" + req.params.name, (err) => {
+            if(err)
+            {
+                console.log(err);
+            }
+        });
+        res.status(201);
+    }
+    else
+    {
+        console.log("Test echoué");
+        res.status(400);
+    }
+});
 
+//Post : Creation dossier dans un dossier
+app.delete('/api/drive/:folder/:name', (req, res, next) => {
+    let folderName = req.params.folder;
+    let name = req.params.name;
+    if(fs.existsSync(os.tmpdir() + "/" + folderName))
+    {
+        if(myRegex.test(name))
+        {
+            console.log("test réussi");
+            //Rajouter un test pour l'existance du dossier
+            fs.rmdir(os.tmpdir() + "/" + folderName + "/" + name, (err) => {
+                if(err)
+                {
+                    console.log(err);
+                }
+            });
+            res.status(201);
+        }
+        else
+        {
+            console.log("Test echoué");
+            res.status(400);
+        }
+    }
+    else
+    {
+        console.log("Le fichier ou répertoire est déjà supprimé");
+        res.status(404);
+    }
+
+})
 
 
 module.exports = app;
