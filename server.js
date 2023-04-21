@@ -35,20 +35,31 @@ app.post('/api/drive', (req, res, next) => {
     //next();
 });
 
-app.get('/api/drive' , (req, res, next) => {
-    let folders = {};
-    let folderString;
+//async
+app.get('/api/drive' , async (req, res, next) => {
 
-    fs.readdir(os.tmpdir(), { withFileTypes: true },(error, files) => {
-        if(error)
+    let files = await fs.promises.readdir(os.tmpdir(), {withFileTypes : true});
+    //fs.statSync(os.tmpdir())// Pour la size
+    const fileList = files.map((fileName) => {
+        if(fileName.isDirectory())
         {
-            console.log(error);
+            return {
+                "name" : fileName.name,
+                "isFolder" : fileName.isDirectory(),
+            }
         }
-        res.status(200).json(files);
+        else
+        {
+            return {
+                "name" : fileName.name,
+                "isFolder" : fileName.isDirectory(),
+                "size" : fs.statSync(os.tmpdir())['size']// Pour la size
+            }
+        }
     });
-    //res.status(200).json(folders);
-    //folderString = fs.readdirSync(os.tmpdir());
-    //res.status(200).json(files);
+
+    res.status(200).json(fileList);
+
 });
 
 
