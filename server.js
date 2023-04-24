@@ -1,7 +1,14 @@
 const express = require('express');
 const os = require('node:os');
 const fs = require('node:fs');
+const bb = require('express-busboy');
 const app = express();
+
+
+bb.extend(app, {
+    upload: true,
+    path: os.tmpdir(),
+});
 
 app.use((req, res, next) => {
     //console.log("coucou : " , express.static('frontend'));
@@ -27,7 +34,7 @@ app.post('/api/drive', (req, res, next) => {
                 console.log(err);
             }
         });
-        res.status(201);
+        res.status(201).send(os.tmpdir());
     }
     else
     {
@@ -51,7 +58,7 @@ app.post('/api/drive/:folder', (req, res, next) => {
                     console.log(err);
                 }
             });
-            res.status(201);
+            res.status(201).send(os.tmpdir() + "/" + folderName);
         }
         else
         {
@@ -149,17 +156,32 @@ app.get('/api/drive/:name', (req, res, next) => {
 
 //DELETE : Supression d'un répertoire
 app.delete('/api/drive/:name', (req, res, next) => {
-    if(myRegex.test(req.params.name))
+    let nameFile = req.params.name;
+    let newFileName = nameFile.replace(/^a-zA-Z ]/g, '');
+    if(myRegex.test(newFileName))
     {
         console.log("test réussi");
         //Rajouter un test pour l'existance du dossier
-        fs.rm(os.tmpdir() + "/" + req.params.name, (err) => {
-            if(err)
+        fs.stat(os.tmpdir() + "/" + nameFile, (err, fold) => {
+            if (fold.isDirectory())
             {
-                console.log(err);
+                fs.rmdir(os.tmpdir() + "/" + nameFile, (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+                res.status(201).send(os.tmpdir());
+            }
+            else
+            {
+                fs.rm(os.tmpdir() + "/" + nameFile, (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+                res.status(201).send(os.tmpdir());
             }
         });
-        res.status(201);
     }
     else
     {
@@ -174,17 +196,31 @@ app.delete('/api/drive/:folder/:name', (req, res, next) => {
     let name = req.params.name;
     if(fs.existsSync(os.tmpdir() + "/" + folderName))
     {
-        if(myRegex.test(name))
+        let newFileName = name.replace(/^a-zA-Z ]/g, '');
+        if(myRegex.test(newFileName))
         {
             console.log("test réussi");
             //Rajouter un test pour l'existance du dossier
-            fs.rm(os.tmpdir() + "/" + folderName + "/" + name, (err) => {
-                if(err)
+            fs.stat(os.tmpdir() + "/" + folderName + "/" + name, (err, fold) => {
+                if (fold.isDirectory())
                 {
-                    console.log(err);
+                    fs.rmdir(os.tmpdir() + "/" + folderName + "/" + name, (err) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                    });
+                    res.status(201).send(os.tmpdir());
+                }
+                else
+                {
+                    fs.rm(os.tmpdir() + "/" + folderName + "/" + name, (err) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                    });
+                    res.status(201).send(os.tmpdir());
                 }
             });
-            res.status(201);
         }
         else
         {
@@ -199,6 +235,27 @@ app.delete('/api/drive/:folder/:name', (req, res, next) => {
     }
 
 })
+
+//////////////////////////////////  METHOD PUT ///////////////////////////////////////////////////
+app.put('/api/drive', (req, res, next) =>
+{
+    let fileName = req.files.file.filename;
+    if(fileName)
+    {
+        console.log("coucou");
+        fs.copyFileSync(req.files.file.file, os.tmpdir() + "/" + fileName);
+        res.status(201).send(os.tmpdir());
+    }
+    else
+    {
+        console.log("pas de fichier");
+        res.status(400);
+    }
+});
+
+app.put('/api/drive/:folder', (req, res, next) => {
+
+});
 
 
 module.exports = app;
