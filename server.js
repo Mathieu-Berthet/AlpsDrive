@@ -239,6 +239,8 @@ app.delete('/api/drive/:folder/:name', (req, res, next) => {
 //////////////////////////////////  METHOD PUT ///////////////////////////////////////////////////
 app.put('/api/drive', (req, res, next) =>
 {
+
+    res.setHeader('Content-Type', 'multipart/form-data');
     let fileName = req.files.file.filename;
     if(fileName)
     {
