@@ -157,7 +157,7 @@ app.get('/api/drive/:name', (req, res, next) => {
 //DELETE : Supression d'un répertoire
 app.delete('/api/drive/:name', (req, res, next) => {
     let nameFile = req.params.name;
-    let newFileName = nameFile.replace(/^a-zA-Z ]/g, '');
+    let newFileName = nameFile.replace('.', '');
     if(myRegex.test(newFileName))
     {
         console.log("test réussi");
@@ -196,7 +196,7 @@ app.delete('/api/drive/:folder/:name', (req, res, next) => {
     let name = req.params.name;
     if(fs.existsSync(os.tmpdir() + "/" + folderName))
     {
-        let newFileName = name.replace(/^a-zA-Z ]/g, '');
+        let newFileName = name.replace('.', '');
         if(myRegex.test(newFileName))
         {
             console.log("test réussi");
@@ -249,12 +249,32 @@ app.put('/api/drive', (req, res, next) =>
     else
     {
         console.log("pas de fichier");
-        res.status(400);
+        res.status(400).send(os.tmpdir());
     }
 });
 
 app.put('/api/drive/:folder', (req, res, next) => {
-
+    let folderName = req.params.folder;
+    if(fs.existsSync(os.tmpdir() + "/" + folderName))
+    {
+        let fileFName = req.files.file.filename;
+        if (fileFName)
+        {
+            console.log("coucou");
+            fs.copyFileSync(req.files.file.file, os.tmpdir() + "/" + folderName + "/" + fileFName);
+            res.status(201).send(os.tmpdir() + "/" + folderName);
+        }
+        else
+        {
+            console.log("pas de fichier");
+            res.status(400).send(os.tmpdir() + "/" + folderName);
+        }
+    }
+    else
+    {
+        console.log("Le répertoire n'existe pas");
+        res.status(404);
+    }
 });
 
 
