@@ -18,23 +18,24 @@ app.use((req, res, next) => {
 
 app.use(express.static('frontend'));
 
+const myPath = os.tmpdir();
 
 let myRegex = /^[a-zA-Z]+$/;
 
 ////////////////////////////////// METHOD POST ///////////////////////////////////////////////////
 //POST : Creation d'un répertoire
-app.post('/api/drive', (req, res, next) => {
+app.post('/api/drive', (req , res) => {
     if(myRegex.test(req.query.name))
     {
         console.log("test réussi");
         //Rajouter un test pour l'existance du dossier
-        fs.mkdir(os.tmpdir() + "/" + req.query.name, (err) => {
+        fs.mkdir(myPath + "/" + req.query.name, (err) => {
             if(err)
             {
                 console.log(err);
             }
         });
-        res.status(201).send(os.tmpdir());
+        res.status(201).send(myPath);
     }
     else
     {
@@ -44,21 +45,21 @@ app.post('/api/drive', (req, res, next) => {
 });
 
 //POST : Creation dossier dans un dossier
-app.post('/api/drive/:folder', (req, res, next) => {
+app.post('/api/drive/:folder', (req, res) => {
     let folderName = req.params.folder;
-    if(fs.existsSync(os.tmpdir() + "/" + folderName))
+    if(fs.existsSync(myPath + "/" + folderName))
     {
         if(myRegex.test(req.query.name))
         {
             console.log("test réussi");
             //Rajouter un test pour l'existance du dossier
-            fs.mkdir(os.tmpdir() + "/" + folderName + "/" + req.query.name, (err) => {
+            fs.mkdir(myPath + "/" + folderName + "/" + req.query.name, (err) => {
                 if(err)
                 {
                     console.log(err);
                 }
             });
-            res.status(201).send(os.tmpdir() + "/" + folderName);
+            res.status(201).send(myPath + "/" + folderName);
         }
         else
         {
@@ -78,9 +79,9 @@ app.post('/api/drive/:folder', (req, res, next) => {
 //////////////////////////////////  METHOD GET ///////////////////////////////////////////////////
 
 //GET tous les fichiers et dossiers d'un répertoire
-app.get('/api/drive' , async (req, res, next) => {
+app.get('/api/drive' , async (req, res) => {
 
-    let files = await fs.promises.readdir(os.tmpdir(), {withFileTypes : true});
+    let files = await fs.promises.readdir(myPath, {withFileTypes : true});
     const fileList = files.map((fileName) => {
         if(fileName.isDirectory())
         {
@@ -94,7 +95,7 @@ app.get('/api/drive' , async (req, res, next) => {
             return {
                 "name" : fileName.name,
                 "isFolder" : fileName.isDirectory(),
-                "size" : fs.statSync(os.tmpdir() + "/" + fileName.name)['size']// Pour la size
+                "size" : fs.statSync(myPath + "/" + fileName.name)['size']// Pour la size
             }
         }
     });
@@ -105,15 +106,15 @@ app.get('/api/drive' , async (req, res, next) => {
 
 
 //GET pour un seul item. Si c'est un répertoire, cela affiche les dossiers et fichiers dedans, si c'est un fichier, affiche les infos du fichier
-app.get('/api/drive/:name', (req, res, next) => {
+app.get('/api/drive/:name', (req, res) => {
     let nameFile = req.params.name;
-    if(fs.existsSync(os.tmpdir() + "/" + nameFile))
+    if(fs.existsSync(myPath + "/" + nameFile))
     {
-        fs.stat(os.tmpdir() + "/" + nameFile, async(err, fold) => {
+        fs.stat(myPath + "/" + nameFile, async(err, fold) => {
             if (fold.isDirectory())
             {
                 //Lire un dossier
-                let folders = await fs.promises.readdir(os.tmpdir() + "/" + nameFile, {withFileTypes: true});
+                let folders = await fs.promises.readdir(myPath + "/" + nameFile, {withFileTypes: true});
                 const folderList = folders.map((folderName) => {
                     if (folderName.isDirectory())
                     {
@@ -127,7 +128,7 @@ app.get('/api/drive/:name', (req, res, next) => {
                         return {
                             "name": folderName.name,
                             "isFolder": folderName.isDirectory(),
-                            "size": fs.statSync(os.tmpdir() + "/" + nameFile + "/" + folderName.name)['size']// Pour la size
+                            "size": fs.statSync(myPath + "/" + nameFile + "/" + folderName.name)['size']// Pour la size
                         }
                     }
                 });
@@ -136,7 +137,7 @@ app.get('/api/drive/:name', (req, res, next) => {
             else
             {
                 //Lire un fichier
-                let myFile = fs.readFileSync(os.tmpdir() + "/" + nameFile, {encoding: 'utf8'});
+                let myFile = fs.readFileSync(myPath + "/" + nameFile, {encoding: 'utf8'});
                 res.status(200).send(myFile);
             }
         })
@@ -155,31 +156,31 @@ app.get('/api/drive/:name', (req, res, next) => {
 // A faire : Tester si c'est un fichier ou un dossier
 
 //DELETE : Supression d'un répertoire
-app.delete('/api/drive/:name', (req, res, next) => {
+app.delete('/api/drive/:name', (req, res) => {
     let nameFile = req.params.name;
     let newFileName = nameFile.replace('.', '');
     if(myRegex.test(newFileName))
     {
         console.log("test réussi");
         //Rajouter un test pour l'existance du dossier
-        fs.stat(os.tmpdir() + "/" + nameFile, (err, fold) => {
+        fs.stat(myPath + "/" + nameFile, (err, fold) => {
             if (fold.isDirectory())
             {
-                fs.rmdir(os.tmpdir() + "/" + nameFile, (err) => {
+                fs.rmdir(myPath + "/" + nameFile, (err) => {
                     if (err) {
                         console.log(err);
                     }
                 });
-                res.status(201).send(os.tmpdir());
+                res.status(201).send(myPath);
             }
             else
             {
-                fs.rm(os.tmpdir() + "/" + nameFile, (err) => {
+                fs.rm(myPath + "/" + nameFile, (err) => {
                     if (err) {
                         console.log(err);
                     }
                 });
-                res.status(201).send(os.tmpdir());
+                res.status(201).send(myPath);
             }
         });
     }
@@ -191,34 +192,34 @@ app.delete('/api/drive/:name', (req, res, next) => {
 });
 
 //DELETE : Supression d'un dossier dans un dossier
-app.delete('/api/drive/:folder/:name', (req, res, next) => {
+app.delete('/api/drive/:folder/:name', (req, res) => {
     let folderName = req.params.folder;
     let name = req.params.name;
-    if(fs.existsSync(os.tmpdir() + "/" + folderName))
+    if(fs.existsSync(myPath + "/" + folderName))
     {
         let newFileName = name.replace('.', '');
         if(myRegex.test(newFileName))
         {
             console.log("test réussi");
             //Rajouter un test pour l'existance du dossier
-            fs.stat(os.tmpdir() + "/" + folderName + "/" + name, (err, fold) => {
+            fs.stat(myPath + "/" + folderName + "/" + name, (err, fold) => {
                 if (fold.isDirectory())
                 {
-                    fs.rmdir(os.tmpdir() + "/" + folderName + "/" + name, (err) => {
+                    fs.rmdir(myPath + "/" + folderName + "/" + name, (err) => {
                         if (err) {
                             console.log(err);
                         }
                     });
-                    res.status(201).send(os.tmpdir());
+                    res.status(201).send(myPath);
                 }
                 else
                 {
-                    fs.rm(os.tmpdir() + "/" + folderName + "/" + name, (err) => {
+                    fs.rm(myPath + "/" + folderName + "/" + name, (err) => {
                         if (err) {
                             console.log(err);
                         }
                     });
-                    res.status(201).send(os.tmpdir());
+                    res.status(201).send(myPath);
                 }
             });
         }
@@ -237,46 +238,46 @@ app.delete('/api/drive/:folder/:name', (req, res, next) => {
 })
 
 //////////////////////////////////  METHOD PUT ///////////////////////////////////////////////////
-app.put('/api/drive', (req, res, next) =>
+app.put('/api/drive', (req, res) =>
 {
 
-    res.setHeader('Content-Type', 'multipart/form-data');
+    res.setHeader('Content-Type', 'multipart/form-data, application/zip');
     res.setHeader('Accept-Encoding', 'gzip, *');
     res.setHeader('Content-Encoding', 'gzip, *');
     let fileName = req.files.file.filename;
     if(fileName)
     {
         console.log("coucou");
-        fs.copyFileSync(req.files.file.file, os.tmpdir() + "/" + fileName);
-        res.status(201).send(os.tmpdir());
+        fs.copyFileSync(req.files.file.file, myPath + "/" + fileName);
+        res.status(201).send(myPath);
     }
     else
     {
         console.log("pas de fichier");
-        res.status(400).send(os.tmpdir());
+        res.status(400).send(myPath);
     }
 });
 
-app.put('/api/drive/:folder', (req, res, next) => {
+app.put('/api/drive/:folder', (req, res) => {
 
     res.setHeader('Content-Type', 'multipart/form-data');
     res.setHeader('Accept-Encoding', 'gzip, *');
     res.setHeader('Content-Encoding', 'gzip, *');
 
     let folderName = req.params.folder;
-    if(fs.existsSync(os.tmpdir() + "/" + folderName))
+    if(fs.existsSync(myPath + "/" + folderName))
     {
         let fileFName = req.files.file.filename;
         if (fileFName)
         {
             console.log("coucou");
-            fs.copyFileSync(req.files.file.file, os.tmpdir() + "/" + folderName + "/" + fileFName);
-            res.status(201).send(os.tmpdir() + "/" + folderName);
+            fs.copyFileSync(req.files.file.file, myPath + "/" + folderName + "/" + fileFName);
+            res.status(201).send(myPath + "/" + folderName);
         }
         else
         {
             console.log("pas de fichier");
-            res.status(400).send(os.tmpdir() + "/" + folderName);
+            res.status(400).send(myPath + "/" + folderName);
         }
     }
     else
