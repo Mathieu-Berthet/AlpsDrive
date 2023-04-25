@@ -20,7 +20,7 @@ app.use(express.static('frontend'));
 
 const myPath = os.tmpdir();
 
-let myRegex = /^[a-zA-Z]+$/;
+let myRegex = /^[a-zA-Z0-9]+$/;
 
 ////////////////////////////////// METHOD POST ///////////////////////////////////////////////////
 //POST : Creation d'un répertoire
