@@ -69,7 +69,7 @@ app.post('/api/drive/:folder', (req, res) => {
     }
     else
     {
-        console.log("Le fichier ou répertoire n'existe pas")
+        console.log("Le fichier ou répertoire n'existe pas");
         res.status(404);
     }
 
@@ -138,6 +138,7 @@ app.get('/api/drive/:name', (req, res) => {
             {
                 //Lire un fichier
                 let myFile = fs.readFileSync(myPath + "/" + nameFile, {encoding: 'utf8'});
+                res.setHeader('Content-Type', 'application/octet-stream');
                 res.status(200).send(myFile);
             }
         })
@@ -241,7 +242,7 @@ app.delete('/api/drive/:folder/:name', (req, res) => {
 app.put('/api/drive', (req, res) =>
 {
 
-    res.setHeader('Content-Type', 'multipart/form-data, application/zip');
+    res.setHeader('Content-Type', 'multipart/form-data');
     res.setHeader('Accept-Encoding', 'gzip, *');
     res.setHeader('Content-Encoding', 'gzip, *');
     let fileName = req.files.file.filename;
