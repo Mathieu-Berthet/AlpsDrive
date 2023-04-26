@@ -1,10 +1,8 @@
 //console.log("Main");
 
 
-
 const http = require('http');
 const app = require('./server.js');
-//const app = require('./app');
 
 
 app.set('port', process.env.PORT || 3000);
