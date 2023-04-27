@@ -159,9 +159,7 @@ app.get('/api/drive/*', (req, res) => {
 //DELETE : Supression d'un répertoire
 app.delete('/api/drive/*', (req, res) => {
     let nameFile = req.params[0];
-    console.log("name : ", nameFile);
     let newFileName = replaceAll(/[./-_* ]/, '', nameFile);
-    console.log("name change : ", newFileName);
     if(myRegex.test(newFileName))
     {
         console.log("test réussi");
