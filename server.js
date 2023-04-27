@@ -45,8 +45,8 @@ app.post('/api/drive', (req , res) => {
 });
 
 //POST : Creation dossier dans un dossier
-app.post('/api/drive/:folder', (req, res) => {
-    let folderName = req.params.folder;
+app.post('/api/drive/*', (req, res) => {
+    let folderName = req.params[0];
     if(fs.existsSync(myPath + "/" + folderName))
     {
         if(myRegex.test(req.query.name))
@@ -106,8 +106,8 @@ app.get('/api/drive' , async (req, res) => {
 
 
 //GET pour un seul item. Si c'est un répertoire, cela affiche les dossiers et fichiers dedans, si c'est un fichier, affiche les infos du fichier
-app.get('/api/drive/:name', (req, res) => {
-    let nameFile = req.params.name;
+app.get('/api/drive/*', (req, res) => {
+    let nameFile = req.params[0];
     if(fs.existsSync(myPath + "/" + nameFile))
     {
         fs.stat(myPath + "/" + nameFile, async(err, fold) => {
@@ -155,11 +155,13 @@ app.get('/api/drive/:name', (req, res) => {
 
 //////////////////////////////////  METHOD DELETE ///////////////////////////////////////////////////
 // A faire : Tester si c'est un fichier ou un dossier
-
+//let myRegex = /^[a-zA-Z0-9]+$/;
 //DELETE : Supression d'un répertoire
-app.delete('/api/drive/:name', (req, res) => {
-    let nameFile = req.params.name;
-    let newFileName = nameFile.replace('.', '');
+app.delete('/api/drive/*', (req, res) => {
+    let nameFile = req.params[0];
+    console.log("name : ", nameFile);
+    let newFileName = replaceAll(/[./-_* ]/, '', nameFile);
+    console.log("name change : ", newFileName);
     if(myRegex.test(newFileName))
     {
         console.log("test réussi");
@@ -192,52 +194,6 @@ app.delete('/api/drive/:name', (req, res) => {
     }
 });
 
-//DELETE : Supression d'un dossier dans un dossier
-app.delete('/api/drive/:folder/:name', (req, res) => {
-    let folderName = req.params.folder;
-    let name = req.params.name;
-    if(fs.existsSync(myPath + "/" + folderName))
-    {
-        let newFileName = name.replace('.', '');
-        if(myRegex.test(newFileName))
-        {
-            console.log("test réussi");
-            //Rajouter un test pour l'existance du dossier
-            fs.stat(myPath + "/" + folderName + "/" + name, (err, fold) => {
-                if (fold.isDirectory())
-                {
-                    fs.rmdir(myPath + "/" + folderName + "/" + name, (err) => {
-                        if (err) {
-                            console.log(err);
-                        }
-                    });
-                    res.status(201).send(myPath);
-                }
-                else
-                {
-                    fs.rm(myPath + "/" + folderName + "/" + name, (err) => {
-                        if (err) {
-                            console.log(err);
-                        }
-                    });
-                    res.status(201).send(myPath);
-                }
-            });
-        }
-        else
-        {
-            console.log("Test echoué");
-            res.status(400);
-        }
-    }
-    else
-    {
-        console.log("Le fichier ou répertoire est déjà supprimé");
-        res.status(404);
-    }
-
-})
-
 //////////////////////////////////  METHOD PUT ///////////////////////////////////////////////////
 app.put('/api/drive', (req, res) =>
 {
@@ -245,9 +201,10 @@ app.put('/api/drive', (req, res) =>
     res.setHeader('Content-Type', 'multipart/form-data');
 
     let fileName = req.files.file.filename;
+    console.log("test : ", fileName);
     if(fileName)
     {
-        console.log("coucou");
+        console.log("Test réussi");
         fs.copyFileSync(req.files.file.file, myPath + "/" + fileName);
         res.status(201).send(myPath);
     }
@@ -258,18 +215,18 @@ app.put('/api/drive', (req, res) =>
     }
 });
 
-app.put('/api/drive/:folder', (req, res) => {
+app.put('/api/drive/*', (req, res) => {
 
     res.setHeader('Content-Type', 'multipart/form-data');
 
 
-    let folderName = req.params.folder;
+    let folderName = req.params[0];
     if(fs.existsSync(myPath + "/" + folderName))
     {
         let fileFName = req.files.file.filename;
         if (fileFName)
         {
-            console.log("coucou");
+            console.log("Test réussi");
             fs.copyFileSync(req.files.file.file, myPath + "/" + folderName + "/" + fileFName);
             res.status(201).send(myPath + "/" + folderName);
         }
@@ -286,5 +243,10 @@ app.put('/api/drive/:folder', (req, res) => {
     }
 });
 
+
+function replaceAll(recherche, remplacement, chainToChange)
+{
+    return chainToChange.split(recherche).join(remplacement);
+}
 
 module.exports = app;
