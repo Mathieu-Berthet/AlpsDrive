@@ -11,8 +11,6 @@ bb.extend(app, {
 });
 
 app.use((req, res, next) => {
-    //console.log("coucou : " , express.static('frontend'));
-    //res.end("vous etes sur le serveur");
     next();
 })
 
@@ -43,13 +41,13 @@ app.post('/api/drive/*', (req, res) => {
         else
         {
             console.log("Test echoué");
-            res.status(400);
+            res.status(400).send("Le nom contient des caractères non alpha-numériques");
         }
     }
     else
     {
         console.log("Le fichier ou répertoire n'existe pas");
-        res.status(404);
+        res.status(404).send("Le fichier ou répertoire n'existe pas");
     }
 
 })
@@ -97,7 +95,7 @@ app.get('/api/drive/*', (req, res) => {
     else
     {
         console.log("Le dossier ou répertoire n'existe pas");
-        res.status(404);
+        res.status(404).send("Le fichier ou répertoire n'existe pas");
     }
 
 });
@@ -109,9 +107,11 @@ app.get('/api/drive/*', (req, res) => {
 app.delete('/api/drive/*', (req, res) => {
     let nameFile = req.params[0];
     let newFileName = replaceAll(/[./-_* ]/, '', nameFile);
-    if(fs.existsSync(myPath + "/" + nameFile)) {
-        if (myRegex.test(newFileName)) {
-            console.log("test réussi");
+    if(fs.existsSync(myPath + "/" + nameFile))
+    {
+        if (myRegex.test(newFileName))
+        {
+            console.log("Test réussi");
             fs.stat(myPath + "/" + nameFile, (err, fold) => {
                 if (fold.isDirectory())
                 {
@@ -120,7 +120,7 @@ app.delete('/api/drive/*', (req, res) => {
                             console.log(err);
                         }
                     });
-                    res.status(201).send(myPath);
+                    res.status(200).send(myPath + "/" + nameFile);
                 }
                 else
                 {
@@ -130,20 +130,20 @@ app.delete('/api/drive/*', (req, res) => {
                             console.log(err);
                         }
                     });
-                    res.status(201).send(myPath);
+                    res.status(200).send(myPath + "/" + nameFile);
                 }
             });
         }
         else
         {
             console.log("Test echoué");
-            res.status(400);
+            res.status(400).send("Le nom contient des caractères non alpha-numériques");
         }
     }
     else
     {
         console.log("Le dossier ou répertoire n'existe pas");
-        res.status(404);
+        res.status(404).send("Le dossier ou répertoire n'existe pas");
     }
 });
 
@@ -151,7 +151,6 @@ app.delete('/api/drive/*', (req, res) => {
 app.put('/api/drive/*', (req, res) => {
 
     res.setHeader('Content-Type', 'multipart/form-data');
-
 
     let folderName = req.params[0];
     if(fs.existsSync(myPath + "/" + folderName))
@@ -166,13 +165,13 @@ app.put('/api/drive/*', (req, res) => {
         else
         {
             console.log("pas de fichier");
-            res.status(400).send(myPath + "/" + folderName);
+            res.status(400).send("pas de fichier");
         }
     }
     else
     {
         console.log("Le répertoire n'existe pas");
-        res.status(404);
+        res.status(404).send("Le répertoire n'existe pas");
     }
 });
 
