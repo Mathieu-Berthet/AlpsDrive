@@ -89,12 +89,21 @@ app.get('/api/drive/*', (req, res) => {
             {
                 //Lire un fichier
                 let myFile= fs.readFileSync(myPath + "/" + nameFile, {encoding: 'utf8'});
+                /*res.sendFile(myPath + '/' + nameFile);
                 let zp = new admz();
+
+                /*for(let k = 0; k < to_zip.length; k++)
+                {
+                    console.log("coucou");
+                    zp.addLocalFile(myPath + '/' + to_zip[k]);
+                }
+
                 const data = zp.toBuffer();
                 res.setHeader('Content-Type', 'application/octet-stream, application/zip');
                 res.setHeader('Content-Disposition', `attachement; filename=${nameFile}`);
-                res.setHeader('Content-Length', data.length);
-                res.status(200).send(data);
+                res.setHeader('Content-Length', data.length);*/
+                res.setHeader('Content-Type', 'application/octet-stream');
+                res.status(200).send(myFile);
             }
         })
     }
@@ -105,30 +114,6 @@ app.get('/api/drive/*', (req, res) => {
     }
 
 });
-
-//Test le téléchargement en .zip
-/*app.get('/api/drive/*', (req, res) => {
-    //let to_zip = fs.readdirSync(myPath);
-    //res.sendFile(myPath + '/' + req.params[0]);
-
-    let name = req.params[0];
-    let zp = new admz();
-
-    for(let k = 0; k < to_zip.length; k++)
-    {
-        console.log("coucou");
-        zp.addLocalFile(myPath + '/' + to_zip[k]);
-    }
-
-    const data = zp.toBuffer();
-    res.set('Content-Type', 'application/octet-stream, application/zip');
-    res.set('Content-Disposition', `attachement; filename=${name}`);
-    res.set('Content-Length', data.length);
-
-    res.send(data);
-
-
-})*/
 
 
 //////////////////////////////////  METHOD DELETE ///////////////////////////////////////////////////
