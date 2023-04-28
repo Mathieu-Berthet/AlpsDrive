@@ -66,6 +66,7 @@ app.get('/api/drive/*', (req, res) => {
             {
                 //Lire un dossier
                 let folders= await fs.promises.readdir(myPath + "/" + nameFile, {withFileTypes: true});
+
                 const folderList= folders.map((folderName) => {
                     if (folderName.isDirectory())
                     {
@@ -89,19 +90,6 @@ app.get('/api/drive/*', (req, res) => {
             {
                 //Lire un fichier
                 let myFile= fs.readFileSync(myPath + "/" + nameFile, {encoding: 'utf8'});
-                /*res.sendFile(myPath + '/' + nameFile);
-                let zp = new admz();
-
-                /*for(let k = 0; k < to_zip.length; k++)
-                {
-                    console.log("coucou");
-                    zp.addLocalFile(myPath + '/' + to_zip[k]);
-                }
-
-                const data = zp.toBuffer();
-                res.setHeader('Content-Type', 'application/octet-stream, application/zip');
-                res.setHeader('Content-Disposition', `attachement; filename=${nameFile}`);
-                res.setHeader('Content-Length', data.length);*/
                 res.setHeader('Content-Type', 'application/octet-stream');
                 res.status(200).send(myFile);
             }
